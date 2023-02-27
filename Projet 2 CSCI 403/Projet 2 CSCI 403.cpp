@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <thread>
+#include <algorithm>
 //#include <pthread.h>
 #include "matrix.h"
 
@@ -9,13 +10,13 @@ using namespace std;
 const int THREADS_NUM = 20;
 const int MAT_SIZE = 1028;
 
-void* mat_multiplication();
+void* mat_multiplication(); //need to figure out how to calculate matrix multiplication
 
 int main()
 {
-    int row, col;
+    int row, col, r = 0; //r is row counter for for loop 
     double ** mat_A, ** mat_B,**mat_C;
-    double sum; //sum 
+    double sum, st_dev,avg; //sum 
 
     mat_A = read2d("a.mat", row, col); 
     mat_B = read2d("b.mat", row, col);
@@ -30,9 +31,19 @@ int main()
 
     for (int i = 0; i < THREADS_NUM; i++) 
     {
-      //for(int j = 0; j < )
-        threads[i] = thread(mat_multiplication());
+        for (int j = r*(row/THREADS_NUM) ; j < min((r+1)*(row/THREADS_NUM),row);j++) 
+        {
+            threads[i] = thread(mat_multiplication());
+            r++; //row increment
 
+            //add parallel calculations of avg, standard dev, etc. 
+
+
+
+
+
+            
+        }  
     }
 
     //joining threads
