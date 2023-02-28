@@ -48,15 +48,12 @@ int main()
 
 }
 
-void* mat_multiplication(double ** A, double **B, double **C, int row, int size, double &stdev, double &sum ) {
-    double temp;
+void* mat_multiplication(double ** A, double **B, double **C, int row, int size, double &sum ) {
 
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) { //HANDWRITE THIS OUT
         for (int j = 0; j < size; j++) {
-            C[][] += A[row][i] * B[i][j];
-            
-        }
+            C[row][i] += A[row][i] * B[i][j];
+         }
+        sum += C[row][i];
     }
-    
-
 }
