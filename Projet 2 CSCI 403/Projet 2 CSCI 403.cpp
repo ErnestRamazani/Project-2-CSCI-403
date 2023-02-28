@@ -37,12 +37,6 @@ int main()
             r++; //row increment
 
             //add parallel calculations of avg, standard dev, etc. 
-
-
-
-
-
-            
         }  
     }
 
@@ -54,9 +48,15 @@ int main()
 
 }
 
-void* mat_multiplication() {
+void* mat_multiplication(double ** A, double **B, double **C, int row, int size, double &stdev, double &sum ) {
+    double temp;
 
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            C[][] += A[row][i] * B[i][j];
+            
+        }
+    }
     
 
-    
 }
