@@ -9,7 +9,6 @@
 
 using namespace std;
 const int THREADS_NUM = 14;
-const int MAT_SIZE = 1028;
 
 void mat_multiplication(double** A, double** B, double** C, int row, int size, double& sum); //need to figure out how to calculate matrix multiplication
 void func1();
@@ -26,9 +25,7 @@ int main()
     mat_B = read2d("b.mat", row, col);
     mat_C = allocate2d(row, col);
 
-    //DEBUG SORRY
-   
-
+    
     print2d("\nMatrix A ", mat_A, row, col); 	// printing matrices
     print2d("\nMatrix B ", mat_B, row, col);
    
@@ -49,7 +46,10 @@ int main()
     write2d("TEST", mat_C, row, col);
    print2d("\nMatrix C", mat_C, row, col);
     cout << "\n SUM: " << sum << endl;
-    cout << "\n AVERAGE: " << avg << endl;
+    cout << "\n AVERAGE: " << sum/(row*col) << endl;
+
+    avg = sum / (row * col);
+    //st_dev = sqrt( (pow(sum,2)/(row*col))
     cout << "\n STANDARD DEVIATION: " << st_dev << endl;
 
 
