@@ -7,10 +7,11 @@
 #include "matrix.h"
 
 using namespace std;
-const int THREADS_NUM = 20;
+const int THREADS_NUM = 4;
 const int MAT_SIZE = 1028;
 
-void* mat_multiplication(); //need to figure out how to calculate matrix multiplication
+void mat_multiplication(double** A, double** B, double** C, int row, int size, double& sum); //need to figure out how to calculate matrix multiplication
+void func1();
 
 int main()
 {
@@ -33,24 +34,36 @@ int main()
     {
         for (int j = r*(row/THREADS_NUM) ; j < min((r+1)*(row/THREADS_NUM),row);j++) 
         {
-            threads[i] = thread(mat_multiplication());
+            threads[i] = thread(func1);
             r++; //row increment
-
             //add parallel calculations of avg, standard dev, etc. 
         }  
     }
 
+
     //joining threads
+    for (int i = 0; i < THREADS_NUM; i++) {
+        threads[i].join();
+    }
+
+    //print2d("\nMatrix C", mat_C, row, col);
+
     free2d(mat_A); 			// deallocate the dynamic memory
     free2d(mat_B);
-    
+  //  free2d(mat_C);
     return 0;
 
 }
 
-void* mat_multiplication(double ** A, double **B, double **C, int row, int size, double &sum ) {
 
-    for (int i = 0; i < size; i++) { //HANDWRITE THIS OUT
+void func1() {
+    cout << "++++" << endl;
+}
+
+
+void mat_multiplication(double ** A, double **B, double **C, int row, int size, double &sum ) {
+
+    for (int i = 0; i < size; i++) { 
         for (int j = 0; j < size; j++) {
             C[row][i] += A[row][i] * B[i][j];
          }
