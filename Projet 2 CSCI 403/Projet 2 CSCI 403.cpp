@@ -8,7 +8,7 @@
 #include "matrix.h"
 
 using namespace std;
-const int THREADS_NUM = 14; //THREAD COUNT
+const int THREADS_NUM = 4; //THREAD COUNT
 
 void mat_multiplication(double** A, double** B, double** C, int row, int size, double& sum, double& avg, double& stdev); //need to figure out how to calculate matrix multiplication
 
@@ -31,13 +31,29 @@ int main()
    // for loop to create threads
     for (int i = 0; i < THREADS_NUM; i++) 
     {
+        /*
         for (int j = r*(row/THREADS_NUM) ; j < min((r+1)*(row/THREADS_NUM),row);j++) 
         {
             threads[i] = thread(mat_multiplication, mat_A, mat_B, mat_C, r, row, ref(sum), ref(avg),ref(st_dev));
-            threads[i].join(); // <<feels wrong to place this here, but will abort without
+             // <<feels wrong to place this here, but will abort without
             r++; //row increment
         }  
+        */
+        // r = current row
+        // row = row size
+
+        auto lambda = [](int r, int row, double** mat_A,double **mat_B, double** mat_C, double& sum, double& avg, double& st_dev ){ 
+            for (int j = r * (row / THREADS_NUM); j < min((r + 1) * (row / THREADS_NUM), row); j++) {
+                mat_multiplication(mat_A, mat_B, mat_C, r, row, ref(sum), ref(avg), ref(st_dev));
+            }
+            r++;
+        };
+
+        threads[i] = thread(lambda, r, row, mat_A, mat_B, mat_C, ref(sum), ref(avg), ref(st_dev));
     }  
+    for (int i = 0; i < THREADS_NUM; i++) {
+        threads[i].join();
+    }
 
     print2d("\nMatrix C", mat_C, row, col);
     cout << "\n SUM: " << sum << endl;
@@ -62,6 +78,7 @@ void mat_multiplication(double ** A, double **B, double **C, int row, int size, 
         for (int j = 0; j < size; j++) {
            // cout << temp << " = " << A[row - 1][i] << "*" << B[i][j] << "\n\n";
             temp += A[row][i] * B[i][j];
+            cout << j << endl;
         }
       //  cout << "C[" << row << "][" << i << "] = " << temp << endl;
        C[row][i] = temp;
