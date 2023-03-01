@@ -34,7 +34,7 @@ int main()
     {
         for (int j = r*(row/THREADS_NUM) ; j < min((r+1)*(row/THREADS_NUM),row);j++) 
         {
-            threads[i] = thread(func1);
+            threads[i] = thread(/* function and params supposed to go here?*/);
             r++; //row increment
             //add parallel calculations of avg, standard dev, etc. 
         }  
@@ -55,9 +55,10 @@ int main()
 
 }
 
-
+//DUMMY FUNTION FOR TESTING
 void func1() {
-    cout << "++++" << endl;
+    for(int i = 0; i < 4; i++)
+     cout << "++++" << endl;
 }
 
 
