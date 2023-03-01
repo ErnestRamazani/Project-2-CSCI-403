@@ -11,7 +11,6 @@ using namespace std;
 const int THREADS_NUM = 14;
 
 void mat_multiplication(double** A, double** B, double** C, int row, int size, double& sum); //need to figure out how to calculate matrix multiplication
-void func1();
 
 int main()
 {
@@ -44,7 +43,7 @@ int main()
     cout << "\n SUM: " << sum << endl;
     cout << "\n AVERAGE: " << sum/(row*col) << endl;
     avg = sum / (row * col);
-    //st_dev = sqrt( (pow(sum,2)/(row*col)) //standard deviation
+    st_dev = sqrt((pow(sum, 2) / (row * col))-pow(avg,2)); //standard deviation
     cout << "\n STANDARD DEVIATION: " << st_dev << endl;
 
     free2d(mat_A); 			// deallocate the dynamic memory
