@@ -8,17 +8,17 @@
 #include "matrix.h"
 
 using namespace std;
-const int THREADS_NUM = 14;
+const int THREADS_NUM = 14; //THREAD COUNT
 
-void mat_multiplication(double** A, double** B, double** C, int row, int size, double& sum); //need to figure out how to calculate matrix multiplication
+void mat_multiplication(double** A, double** B, double** C, int row, int size, double& sum, double& avg, double& stdev); //need to figure out how to calculate matrix multiplication
 
 int main()
 {
-
     auto start = chrono::steady_clock::now(); // start time
     int row, col, r = 0; //r is row counter for for loop 
     double ** mat_A, ** mat_B,**mat_C;
     double sum = 0, st_dev = 0,avg = 0; //sum 
+    double average = 0;
 
     mat_A = read2d("a.mat", row, col); 
     mat_B = read2d("b.mat", row, col);
@@ -33,7 +33,7 @@ int main()
     {
         for (int j = r*(row/THREADS_NUM) ; j < min((r+1)*(row/THREADS_NUM),row);j++) 
         {
-            threads[i] = thread(mat_multiplication,mat_A,mat_B,mat_C,r,row,ref(sum));
+            threads[i] = thread(mat_multiplication, mat_A, mat_B, mat_C, r, row, ref(sum), ref(avg),ref(st_dev));
             threads[i].join(); // <<feels wrong to place this here, but will abort without
             r++; //row increment
         }  
@@ -41,9 +41,8 @@ int main()
 
     print2d("\nMatrix C", mat_C, row, col);
     cout << "\n SUM: " << sum << endl;
-    cout << "\n AVERAGE: " << sum/(row*col) << endl;
-    avg = sum / (row * col);
-    st_dev = sqrt((pow(sum, 2) / (row * col))-pow(avg,2)); //standard deviation
+    cout << "\n AVERAGE: " << avg << endl;
+    st_dev = sqrt(st_dev - pow(avg,2)); //standard deviation
     cout << "\n STANDARD DEVIATION: " << st_dev << endl;
 
     free2d(mat_A); 			// deallocate the dynamic memory
@@ -57,7 +56,7 @@ int main()
 
 }
 
-void mat_multiplication(double ** A, double **B, double **C, int row, int size, double &sum ) {
+void mat_multiplication(double ** A, double **B, double **C, int row, int size, double &sum, double &avg,double& stdev ) {
     double temp = 0;
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
@@ -67,5 +66,7 @@ void mat_multiplication(double ** A, double **B, double **C, int row, int size, 
       //  cout << "C[" << row << "][" << i << "] = " << temp << endl;
        C[row][i] = temp;
        sum += C[row][i];
+       avg += (C[row][i]) / (size * size);
+       stdev += (pow(C[row][i], 2)) / (size*size);
     }
 }
