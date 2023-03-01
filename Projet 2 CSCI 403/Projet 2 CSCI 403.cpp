@@ -3,11 +3,11 @@
 #include <iostream>
 #include <thread>
 #include <algorithm>
-//#include <pthread.h>
+#include <chrono>
 #include "matrix.h"
 
 using namespace std;
-const int THREADS_NUM = 4;
+const int THREADS_NUM = 14;
 const int MAT_SIZE = 1028;
 
 void mat_multiplication(double** A, double** B, double** C, int row, int size, double& sum); //need to figure out how to calculate matrix multiplication
@@ -15,6 +15,8 @@ void func1();
 
 int main()
 {
+
+    auto start = chrono::steady_clock::now();
     int row, col, r = 0; //r is row counter for for loop 
     double ** mat_A, ** mat_B,**mat_C;
     double sum = 0, st_dev,avg; //sum 
@@ -44,15 +46,16 @@ int main()
         //threads[i].join();
     }  
 
-   // write2d("TEST", mat_C, row, col);
+    write2d("TEST", mat_C, row, col);
     print2d("\nMatrix C", mat_C, row, col);
    
 
     free2d(mat_A); 			// deallocate the dynamic memory
     free2d(mat_B);
     free2d(mat_C);
-    
-    
+    auto end = chrono::steady_clock::now();
+
+    cout << "\n Elapsed time: " << chrono::duration_cast<chrono::microseconds>(end - start).count() << " microseconds";
     return 0;
 
 }
