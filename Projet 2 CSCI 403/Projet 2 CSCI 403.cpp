@@ -25,11 +25,8 @@ int main()
     mat_B = read2d("b.mat", row, col);
     mat_C = allocate2d(row, col);
 
-    
     print2d("\nMatrix A ", mat_A, row, col); 	// printing matrices
     print2d("\nMatrix B ", mat_B, row, col);
-   
-
 
    thread threads[THREADS_NUM];
    // for loop to create threads
@@ -38,37 +35,28 @@ int main()
         for (int j = r*(row/THREADS_NUM) ; j < min((r+1)*(row/THREADS_NUM),row);j++) 
         {
             threads[i] = thread(mat_multiplication,mat_A,mat_B,mat_C,r,row,ref(sum));
-            threads[i].join(); // <<-- feels wrong to place this here, but will abort without
+            threads[i].join(); // <<feels wrong to place this here, but will abort without
             r++; //row increment
         }  
     }  
 
-    write2d("TEST", mat_C, row, col);
-   print2d("\nMatrix C", mat_C, row, col);
+    print2d("\nMatrix C", mat_C, row, col);
     cout << "\n SUM: " << sum << endl;
     cout << "\n AVERAGE: " << sum/(row*col) << endl;
-
     avg = sum / (row * col);
-    //st_dev = sqrt( (pow(sum,2)/(row*col))
+    //st_dev = sqrt( (pow(sum,2)/(row*col)) //standard deviation
     cout << "\n STANDARD DEVIATION: " << st_dev << endl;
-
 
     free2d(mat_A); 			// deallocate the dynamic memory
     free2d(mat_B);
     free2d(mat_C);
+
     auto end = chrono::steady_clock::now(); //end time
 
     cout << "\n Elapsed time: " << chrono::duration_cast<chrono::microseconds>(end - start).count() << " microseconds";
     return 0;
 
 }
-
-//DUMMY FUNTION FOR TESTING
-void func1() {
-    for(int i = 0; i < 4; i++)
-     cout << "++++" << endl;
-}
-
 
 void mat_multiplication(double ** A, double **B, double **C, int row, int size, double &sum ) {
     double temp = 0;
