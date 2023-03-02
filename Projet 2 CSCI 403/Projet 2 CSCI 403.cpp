@@ -2,13 +2,12 @@
 
 #include <iostream>
 #include <thread>
-#include <algorithm>
 #include <cmath>
 #include <chrono>
 #include "matrix.h"
 
 using namespace std;
-const int THREADS_NUM = 4; //THREAD COUNT
+const int THREADS_NUM = 5; //THREAD COUNT
 
 void mat_multiplication(double** A, double** B, double** C, int row, int size, double& sum, double& avg, double& stdev); //need to figure out how to calculate matrix multiplication
 
@@ -18,6 +17,12 @@ int main()
     int row, col, r = 0; //r is row counter for for loop 
     double ** mat_A, ** mat_B,**mat_C;
     double sum = 0, st_dev = 0,avg = 0; //sum 
+    double sum_ar[THREADS_NUM], st_dev_ar[THREADS_NUM], avg_ar[THREADS_NUM]; //arrays, index for each thread to add together after all threads are finished
+    for (int i = 0; i < THREADS_NUM; i++) {
+        sum_ar[i] = 0;
+        st_dev_ar[i] = 0;
+        avg_ar[0] = 0;
+    }
     double average = 0;
 
     mat_A = read2d("a.mat", row, col); 
@@ -28,31 +33,50 @@ int main()
     print2d("\nMatrix B ", mat_B, row, col);
 
    thread threads[THREADS_NUM];
+
+   auto lambda = [](int& r, int row, double** mat_A, double** mat_B, double** mat_C,int thread,double* sum_ar,double* avg_ar, double* st_dev_ar) {
+       
+       double sum = 0, st_dev = 0, avg = 0;
+
+       for (int j = r * (row / THREADS_NUM); j < (min((r + 1) * (row / THREADS_NUM), row))-1; j++) {
+        //   cout << "rows " << r * (row / THREADS_NUM) << "-" << min((r + 1) * (row / THREADS_NUM), row) << endl;
+
+           mat_multiplication(mat_A, mat_B, mat_C, r, row, ref(sum), ref(avg), ref(st_dev));
+           sum_ar[thread] += sum;
+           avg_ar[thread] += avg;
+           st_dev_ar[thread] += st_dev;
+
+           if (r < row - 1) {
+               r++;
+           }
+       }
+       cout << sum_ar[thread] << endl;
+       cout << "THREAD " << thread << " DONE!!" << endl;
+   };
    // for loop to create threads
     for (int i = 0; i < THREADS_NUM; i++) 
     {
-        /*
-        for (int j = r*(row/THREADS_NUM) ; j < min((r+1)*(row/THREADS_NUM),row);j++) 
-        {
-            threads[i] = thread(mat_multiplication, mat_A, mat_B, mat_C, r, row, ref(sum), ref(avg),ref(st_dev));
-             // <<feels wrong to place this here, but will abort without
-            r++; //row increment
-        }  
-        */
+        //for (int j = r*(row/THREADS_NUM) ; j < min((r+1)*(row/THREADS_NUM),row);j++) 
+        //{
+        //    threads[i] = thread(mat_multiplication, mat_A, mat_B, mat_C, r, row, ref(sum), ref(avg),ref(st_dev));
+        //    threads[i].join();// <<feels wrong to place this here, but will abort without
+        //    r++; //row increment
+        //}  
+        //
+
         // r = current row
         // row = row size
-
-        auto lambda = [](int r, int row, double** mat_A,double **mat_B, double** mat_C, double& sum, double& avg, double& st_dev ){ 
-            for (int j = r * (row / THREADS_NUM); j < min((r + 1) * (row / THREADS_NUM), row); j++) {
-                mat_multiplication(mat_A, mat_B, mat_C, r, row, ref(sum), ref(avg), ref(st_dev));
-            }
-            r++;
-        };
-
-        threads[i] = thread(lambda, r, row, mat_A, mat_B, mat_C, ref(sum), ref(avg), ref(st_dev));
+        threads[i] = thread(lambda, ref(r), row, mat_A, mat_B, mat_C,i,sum_ar, avg_ar,st_dev_ar);
+        
     }  
+ 
     for (int i = 0; i < THREADS_NUM; i++) {
         threads[i].join();
+    }
+    for (int i = 0; i < THREADS_NUM; i++) {
+        sum += sum_ar[i];
+        avg += avg_ar[i];
+        st_dev += st_dev_ar[i];
     }
 
     print2d("\nMatrix C", mat_C, row, col);
@@ -72,18 +96,17 @@ int main()
 
 }
 
-void mat_multiplication(double ** A, double **B, double **C, int row, int size, double &sum, double &avg,double& stdev ) {
+void mat_multiplication(double ** A, double **B, double **C, int row, int size, double &rowsum, double &avg,double& stdev ) {
     double temp = 0;
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
-           // cout << temp << " = " << A[row - 1][i] << "*" << B[i][j] << "\n\n";
             temp += A[row][i] * B[i][j];
-            cout << j << endl;
-        }
-      //  cout << "C[" << row << "][" << i << "] = " << temp << endl;
+        } 
        C[row][i] = temp;
-       sum += C[row][i];
+      
+       rowsum += C[row][i];
        avg += (C[row][i]) / (size * size);
        stdev += (pow(C[row][i], 2)) / (size*size);
     }
+ 
 }
