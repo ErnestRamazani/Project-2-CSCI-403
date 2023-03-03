@@ -106,16 +106,16 @@ int main()
 }
 
 void mat_multiplication(double ** A, double **B, double **C, int row, int size, double &rowsum, double &avg,double& stdev ) {
-    double temp = 0;
+    
     for (int i = 0; i < size; i++) {
+        double temp = 0;
         for (int j = 0; j < size; j++) {
-            temp += A[row][i] * B[i][j];
+            temp += A[row][j] * B[j][i];
         } 
        C[row][i] = temp;
-
-       rowsum += C[row][i];
-       avg += (C[row][i]) / (size * size);
-       stdev += (pow(C[row][i], 2)) / (size*size);
+       //rowsum += C[row][i];
+       //avg += (C[row][i]) / (size * size);
+       //stdev += (pow(C[row][i], 2)) / (size*size);
     }
  
 }
